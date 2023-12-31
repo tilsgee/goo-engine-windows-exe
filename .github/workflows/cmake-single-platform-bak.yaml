@@ -1,0 +1,24 @@
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install SVN
+      run: choco install svn
+
+    - name: Checkout Library
+      run: svn checkout https://svn.blender.org/svnroot/bf-blender/trunk/lib/win64_vc15 lib/win64_vc15
+
+    - name: Move Library
+      run: mv lib/win64_vc15/* "D:/a/goo-engine-windows-exe/goo-engine-windows-exe/.."
+
+    - name: Update PATH
+      run: echo "PATH=$(echo $PATH):C:/Program Files (x86)/Subversion/bin" >> $GITHUB_ENV
+
+    - name: Configure CMake
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+    - name: Build
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
