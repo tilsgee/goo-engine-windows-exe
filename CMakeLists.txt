@@ -27,6 +27,12 @@ endif()
 
 cmake_minimum_required(VERSION 3.10)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
+
+set(LIBDIR "/usr/lib/x86_64-linux-gnu")
+
+find_package(Epoxy REQUIRED)
+
 if(NOT EXECUTABLE_OUTPUT_PATH)
   set(FIRST_RUN TRUE)
 else()
