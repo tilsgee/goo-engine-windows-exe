@@ -1,24 +1,43 @@
+name: Build Blender 3D for Windows
+
+on:
+  push:
+    branches:
+      - main
+
 jobs:
   build:
     runs-on: windows-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Install SVN
-      run: choco install svn
+      - name: Install dependencies
+        run: |
+          choco install -y cmake git python ninja
+          choco install -y visualstudio2019-workload-vctools
 
-    - name: Checkout Library
-      run: svn checkout https://svn.blender.org/svnroot/bf-blender/trunk/lib/win64_vc15 lib/win64_vc15
+      - name: Download Blender libraries
+        run: |
+          curl -o blender-libraries.zip https://www.blender.org/wp-content/uploads/build-libs/blender-libraries-win64.zip
+          7z x blender-libraries.zip
 
-    - name: Move Library
-      run: mv lib/win64_vc15/* "D:/a/goo-engine-windows-exe/goo-engine-windows-exe/.."
+      - name: Clone Blender repository
+        run: |
+          git clone https://github.com/blender/blender.git
+          cd blender
 
-    - name: Update PATH
-      run: echo "PATH=$(echo $PATH):C:/Program Files (x86)/Subversion/bin" >> $GITHUB_ENV
+      - name: Build Blender
+        run: |
+          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_SYSTEM_NAME=Windows -G "Ninja" .
+          cmake --build .
 
-    - name: Configure CMake
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+      - name: Archive build
+        run: |
+          7z a blender-build.7z .
 
-    - name: Build
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: blender-build
+          path: blender-build.7z
