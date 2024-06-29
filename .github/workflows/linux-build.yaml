@@ -25,23 +25,32 @@ jobs:
         sudo apt update
         sudo apt install -y cmake git ninja-build
 
-    - name: Clone Blender repository
-      run: git clone https://github.com/blender/blender.git
-      working-directory: ${{ github.workspace }}/blender
+      - name: Clone Blender repository
+      run: |
+        mkdir -p ${{ github.workspace }}/blender
+        cd ${{ github.workspace }}/blender
+        git clone https://github.com/blender/blender.git .
 
     - name: Configure CMake
-      run: cmake -B ${{ github.workspace }}/blender/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_SYSTEM_NAME=Linux -G "Ninja"
+      run: |
+        cd ${{ github.workspace }}/blender
+        mkdir -p build
+        cd build
+        cmake -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_SYSTEM_NAME=Linux -G "Ninja" ..
 
     - name: Build
-      run: cmake --build ${{ github.workspace }}/blender/build --config ${{env.BUILD_TYPE}}
+      run: |
+        cd ${{ github.workspace }}/blender/build
+        cmake --build . --config ${{env.BUILD_TYPE}}
 
     - name: Create AppImage
       run: |
+        cd ${{ github.workspace }}/blender/build
         sudo apt install -y appimagetool
-        appimagetool ${{ github.workspace }}/blender/build/blender ${{ github.workspace }}/blender/blender.appimage
+        appimagetool blender ../blender.appimage
+
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
         name: blender-appimage
         path: ${{ github.workspace }}/blender/blender.appimage
-
