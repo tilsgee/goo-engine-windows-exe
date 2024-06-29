@@ -26,6 +26,23 @@ jobs:
           sudo apt install -y cmake git ninja-build
           sudo apt-get install libepoxy-dev
 
+      - name: Install Linux Specific dependencies 
+        run: |
+          sudo apt update
+          sudo apt install -y \
+            libvulkan1 libvulkan-dev \
+            libx11-dev libxcb-glx0-dev libxcb-icccm4-dev \
+            libxcb-image0-dev libxcb-keysyms1-dev libxcb-randr0-dev \
+            libxcb-render-util0-dev libxcb-render0-dev libxcb-shape0-dev \
+            libxcb-shm0-dev libxcb-sync-dev libxcb-util-dev \
+            libxcb-xfixes0-dev libxcb-xkb-dev libxext-dev libxfixes-dev \
+            libxi-dev libxinerama-dev libxrandr-dev libxrender-dev \
+            libxss-dev libxt-dev libxtst-dev libxv-dev libxxf86vm-dev \
+            libxxf86dga-dev mesa-common-dev libegl1-mesa-dev libgbm-dev \
+            libgles2-mesa-dev libgl1-mesa-dev libglu1-mesa-dev libosmesa6-dev \
+            libwayland-dev libwayland-egl1-mesa-dev libwayland-test-dev \
+            libxkbcommon-dev libxkbcommon-x11-dev
+
       - name: Install Vulkan dependencies
         run: |
           sudo apt update
