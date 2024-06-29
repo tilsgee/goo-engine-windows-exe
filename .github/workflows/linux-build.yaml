@@ -18,39 +18,39 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Install dependencies
-      run: |
-        sudo apt update
-        sudo apt install -y cmake git ninja-build
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y cmake git ninja-build
 
       - name: Clone Blender repository
       - run: |
-        mkdir -p ${{ github.workspace }}/blender
-        cd ${{ github.workspace }}/blender
-        git clone https://github.com/blender/blender.git .
+          mkdir -p ${{ github.workspace }}/blender
+          cd ${{ github.workspace }}/blender
+          git clone https://github.com/blender/blender.git .
 
-    - name: Configure CMake
-      run: |
-        cd ${{ github.workspace }}/blender
-        mkdir -p build
-        cd build
-        cmake -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_SYSTEM_NAME=Linux -G "Ninja" ..
+      - name: Configure CMake
+        run: |
+          cd ${{ github.workspace }}/blender
+          mkdir -p build
+          cd build
+          cmake -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_SYSTEM_NAME=Linux -G "Ninja" ..
 
-    - name: Build
-      run: |
-        cd ${{ github.workspace }}/blender/build
-        cmake --build . --config ${{env.BUILD_TYPE}}
+      - name: Build
+        run: |
+          cd ${{ github.workspace }}/blender/build
+          cmake --build . --config ${{env.BUILD_TYPE}}
 
-    - name: Create AppImage
-      run: |
-        cd ${{ github.workspace }}/blender/build
-        sudo apt install -y appimagetool
-        appimagetool blender ../blender.appimage
+      - name: Create AppImage
+        run: |
+          cd ${{ github.workspace }}/blender/build
+          sudo apt install -y appimagetool
+          appimagetool blender ../blender.appimage
 
-    - name: Upload artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: blender-appimage
-        path: ${{ github.workspace }}/blender/blender.appimage
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: blender-appimage
+          path: ${{ github.workspace }}/blender/blender.appimage
