@@ -45,7 +45,7 @@ jobs:
             libxss-dev libxt-dev libxtst-dev libxv-dev libxxf86vm-dev \
             libxxf86dga-dev mesa-common-dev libegl1-mesa-dev libgbm-dev \
             libgles2-mesa-dev libgl1-mesa-dev libglu1-mesa-dev libosmesa6-dev \
-            libwayland-dev libwayland-egl1-mesa-dev libwayland-test-dev \
+            libwayland-dev* \
             libxkbcommon-dev libxkbcommon-x11-dev
 
       - name: Install Vulkan dependencies
