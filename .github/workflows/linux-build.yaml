@@ -24,9 +24,10 @@ jobs:
       run: |
         sudo apt update
         sudo apt install -y cmake git ninja-build
+
     - name: Clone Blender repository
       run: git clone https://github.com/blender/blender.git
-      working-directory: $GITHUB_WORKSPACE/blender
+      working-directory: ${{ github.workspace }}/blender
 
     - name: Configure CMake
       run: cmake -B $GITHUB_WORKSPACE/blender/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_SYSTEM_NAME=Linux -G "Ninja"
