@@ -25,6 +25,7 @@ if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
   endif()
 endif()
 
+#this is where tilsgee added his own code
 cmake_minimum_required(VERSION 3.30)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
@@ -32,6 +33,10 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
 set(LIBDIR "/usr/lib/x86_64-linux-gnu")
 
 find_package(Epoxy REQUIRED)
+
+message(STATUS "CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
+
+set(Epoxy_ROOT "/usr/lib/x86_64-linux-gnu")
 
 if(NOT EXECUTABLE_OUTPUT_PATH)
   set(FIRST_RUN TRUE)
