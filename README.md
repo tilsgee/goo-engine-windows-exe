@@ -22,7 +22,7 @@ use Goo Engine on projects at the studio. [Stay tuned](https://twitter.com/dillo
 Get the pre-built download on the [Patreon page](https://www.patreon.com/dillongoo) to support continued development of 
 Goo Engine. or help Tils-Gee to build it using [Github Actions](https://docs.github.com/en/actions) for automatic updates.
 
-__List of problem is under "Word from Tils-Gee" on this exact readme file__
+__List of problem is under "[Word from Tils-Gee](https://github.com/tilsgee/goo-engine-windows-exe/blob/goo-engine-main/README.md#word-from-tils-gee)"__
 
 Blender
 =======
