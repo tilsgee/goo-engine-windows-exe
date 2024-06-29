@@ -22,7 +22,6 @@ use Goo Engine on projects at the studio. [Stay tuned](https://twitter.com/dillo
 Get the pre-built download on the [Patreon page](https://www.patreon.com/dillongoo) to support continued development of 
 Goo Engine. Tils-Gee only offers Windows Executable for people who can't afford to pay monthly for DillonGoo's Patreon page.
 
-
 Blender
 =======
 
@@ -47,7 +46,6 @@ Development
 - [Developer Forum](https://devtalk.blender.org)
 - [Developer Documentation](https://developer.blender.org/docs/)
 
-
 License
 -------
 
@@ -55,3 +53,11 @@ Blender as a whole is licensed under the GNU General Public License, Version 3.
 Individual files may have a different, but compatible license.
 
 See [blender.org/about/license](https://www.blender.org/about/license) for details.
+
+Word from Tils-Gee
+------------------
+
+__actually, there aren't any. i just want to add checklist instead__
+
+- [ ] Actually building Windows build [SVN error as always, lol. i'm tired]
+- [ ] Building Universal Linux (*.appimage) build [i keep getting "shaderc doesn't exist" error whether i install it manually or using "apt" command]
