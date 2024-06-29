@@ -26,6 +26,11 @@ jobs:
           sudo apt install -y cmake git ninja-build
           sudo apt-get install libepoxy-dev
 
+      - name: Add more repository
+        run: |
+          sudo add-apt-repository universe
+          sudo apt update
+
       - name: Install Linux Specific dependencies 
         run: |
           sudo apt update
