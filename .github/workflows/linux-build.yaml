@@ -32,6 +32,7 @@ jobs:
           tar -xvf install.tgz
           sudo mv install /usr/local/shaderc
           sudo find /usr/local/shaderc -name shaderc -exec update-alternatives --install /usr/bin/shaderc shaderc {} 1 \;
+          export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/shaderc/install/lib/pkgconfig
         #tar -xvf install.tar
 
       - name: Add more repository
