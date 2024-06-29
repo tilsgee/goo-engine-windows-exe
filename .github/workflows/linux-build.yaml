@@ -1,4 +1,4 @@
-name: CMake on a single platform
+name: Linux build of Goo Engine
 
 on:
   push:
@@ -26,7 +26,7 @@ jobs:
           sudo apt install -y cmake git ninja-build
 
       - name: Clone Blender repository
-      - run: |
+        run: |
           mkdir -p ${{ github.workspace }}/blender
           cd ${{ github.workspace }}/blender
           git clone https://github.com/blender/blender.git .
