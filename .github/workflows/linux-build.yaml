@@ -26,6 +26,11 @@ jobs:
           sudo apt install -y cmake git ninja-build
           sudo apt-get install libepoxy-dev
 
+      - name: Install Vulkan dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y libvulkan1 libvulkan-dev
+
       - name: Clone Blender repository
         run: |
           mkdir -p ${{ github.workspace }}/blender
