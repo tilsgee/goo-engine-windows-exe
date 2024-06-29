@@ -30,17 +30,18 @@ jobs:
       working-directory: ${{ github.workspace }}/blender
 
     - name: Configure CMake
-      run: cmake -B $GITHUB_WORKSPACE/blender/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_SYSTEM_NAME=Linux -G "Ninja"
+      run: cmake -B ${{ github.workspace }}/blender/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_SYSTEM_NAME=Linux -G "Ninja"
 
     - name: Build
-      run: cmake --build $GITHUB_WORKSPACE/blender/build --config ${{env.BUILD_TYPE}}
+      run: cmake --build ${{ github.workspace }}/blender/build --config ${{env.BUILD_TYPE}}
 
     - name: Create AppImage
       run: |
         sudo apt install -y appimagetool
-        appimagetool $GITHUB_WORKSPACE/blender/build/blender $GITHUB_WORKSPACE/blender/blender.appimage
+        appimagetool ${{ github.workspace }}/blender/build/blender ${{ github.workspace }}/blender/blender.appimage
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
         name: blender-appimage
-        path: $GITHUB_WORKSPACE/blender/blender.appimage
+        path: ${{ github.workspace }}/blender/blender.appimage
+
