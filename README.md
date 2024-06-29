@@ -20,7 +20,9 @@ with the native Blender branch so they can evolve side by side. We also regularl
 use Goo Engine on projects at the studio. [Stay tuned](https://twitter.com/dillongoostudio) for updates.
 
 Get the pre-built download on the [Patreon page](https://www.patreon.com/dillongoo) to support continued development of 
-Goo Engine. Tils-Gee only offers Windows Executable for people who can't afford to pay monthly for DillonGoo's Patreon page.
+Goo Engine. or help Tils-Gee to build it using [Github Actions](https://docs.github.com/en/actions) for automatic updates.
+
+__List of problem is under "Word from Tils-Gee" on this exact readme file__
 
 Blender
 =======
