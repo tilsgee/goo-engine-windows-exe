@@ -14,18 +14,14 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Install Build & Packaging Dependencies (Linux)
+      - name: Install System Dependencies
         run: |
           sudo apt-get update
-          # Install build tools and extra libraries (Vulkan, TIFF, etc.)
-          sudo apt-get install -y build-essential cmake git wget \
-            libxi-dev libxrandr-dev libx11-dev libglu1-mesa-dev \
-            libfreetype6-dev libxext-dev libssl-dev libjpeg-dev libepoxy-dev \
-            libvulkan-dev libtiff-dev
+          # Run the custom script to install missing dependencies.
+          ./tools/install_missing_deps.sh
 
       - name: Build and Install Shaderc
         run: |
-          echo "Cloning and building Shaderc..."
           git clone https://github.com/google/shaderc.git
           cd shaderc
           mkdir build && cd build
@@ -57,7 +53,6 @@ jobs:
         run: |
           cd build
           mkdir -p AppDir/usr/bin
-          # Adjust the executable name/path as appropriate
           cp goo_engine AppDir/usr/bin/
           cp ../tools/AppRun AppDir/
           cp ../tools/goo_engine.desktop AppDir/
@@ -66,14 +61,7 @@ jobs:
 
       - name: Package Goo Engine as AppImage
         run: |
-          cd build
-          appimagetool AppDir goo_engine-linux-x86_64.AppImage
 
-      - name: Upload Linux AppImage Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: goo_engine-linux-appimage
-          path: build/goo_engine-linux-x86_64.AppImage
 
   build-windows:
     name: Build Goo Engine on Windows (MSI)
