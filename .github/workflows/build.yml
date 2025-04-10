@@ -22,7 +22,7 @@ jobs:
 
       - name: Build and Install Shaderc
         run: |
-            git clone https://github.com/google/shaderc.git
+            git clone https://github.com/tilsgee/shaderc_for_github_action.git
             cd shaderc
             mkdir build && cd build
             cmake .. -DCMAKE_BUILD_TYPE=Release -DSHADERC_SKIP_TESTS=ON -DSPIRV-TOOLS_ROOT=/usr
