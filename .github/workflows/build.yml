@@ -19,18 +19,18 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential cmake git wget \
             libxi-dev libxrandr-dev libx11-dev libglu1-mesa-dev \
-            libfreetype6-dev libxext-dev libssl-dev libjpeg-dev
-          # Download appimagetool manually since it's not in apt-get
+            libfreetype6-dev libxext-dev libssl-dev libjpeg-dev libepoxy-dev
+          # Download appimagetool manually since it's not available in apt
           wget -O appimagetool https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
           chmod +x appimagetool
           sudo mv appimagetool /usr/local/bin/
 
-      - name: Configure Build with CMake
+      - name: Configure Build with CMake (Linux)
         run: |
           mkdir build && cd build
           cmake .. -DCMAKE_BUILD_TYPE=Release
 
-      - name: Build Blender
+      - name: Build Blender (Linux)
         run: |
           cd build
           cmake --build . -- -j$(nproc)
@@ -39,7 +39,7 @@ jobs:
         run: |
           cd build
           mkdir -p AppDir/usr/bin
-          # Copy the built Blender executable; adjust path if necessary.
+          # Copy the built Blender executable; adjust the filename/path if needed.
           cp blender AppDir/usr/bin/
           # Copy additional files from the tools folder into the AppDir.
           cp ../tools/AppRun AppDir/
@@ -56,7 +56,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: blender4x-linux-appimage
-          path: build/blender-4.x-linux-x86_64.AppImage
+          path: build/blender-4.x-linux-appimage.AppImage
 
   build-windows:
     name: Build Blender 4.x on Windows (MSI)
@@ -69,7 +69,15 @@ jobs:
         run: |
           choco upgrade chocolatey -y
           choco install cmake -y --installargs 'ADD_CMAKE_TO_PATH=System'
-          choco install wix-toolset --pre -y
+
+      - name: Download WiX Toolset Binaries from GitHub
+        run: |
+          # Create a folder for WiX binaries
+          New-Item -ItemType Directory -Force -Path "C:\wix"
+          # Download the WiX Toolset binaries zip (e.g., v3.11.2 release)
+          Invoke-WebRequest -Uri "https://github.com/wixtoolset/wix3/releases/download/wix3112rtm/wix311-binaries.zip" -OutFile "C:\wix\wix311-binaries.zip"
+          # Extract the binaries
+          Expand-Archive -Path "C:\wix\wix311-binaries.zip" -DestinationPath "C:\wix"
 
       - name: Configure Build with CMake (Windows)
         run: |
@@ -77,7 +85,7 @@ jobs:
           cd build
           cmake .. -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Release
 
-      - name: Build Blender
+      - name: Build Blender (Windows)
         run: |
           cd build
           cmake --build . --config Release -- /m
@@ -85,8 +93,8 @@ jobs:
       - name: Package Blender as MSI Using WiX Toolset
         working-directory: build
         run: >
-          "C:\Program Files (x86)\WiX Toolset v3.11\bin\candle.exe" ../tools/installer.wxs -out installer.wixobj &&
-          "C:\Program Files (x86)\WiX Toolset v3.11\bin\light.exe" installer.wixobj -out blender-4.x.wix.msi
+          "C:\wix\bin\candle.exe" ../tools/installer.wxs -out installer.wixobj &&
+          "C:\wix\bin\light.exe" installer.wixobj -out blender-4.x.wix.msi
 
       - name: Upload Windows MSI Artifact
         uses: actions/upload-artifact@v4
