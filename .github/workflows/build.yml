@@ -20,14 +20,14 @@ jobs:
           # Run the custom script to install missing dependencies.
           bash tools/install_missing_deps.sh
 
-      - name: Build and Install Shaderc
-        run: |
-          git clone https://github.com/google/shaderc.git
-          cd shaderc
-          mkdir build && cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release -DSHADERC_SKIP_TESTS=ON
-          make -j$(nproc)
-          sudo make install
+          - name: Build and Install Shaderc
+          run: |
+            git clone https://github.com/google/shaderc.git
+            cd shaderc
+            mkdir build && cd build
+            cmake .. -DCMAKE_BUILD_TYPE=Release -DSHADERC_SKIP_TESTS=ON -DSPIRV-TOOLS_ROOT=/usr
+            make -j$(nproc)
+            sudo make install
 
       - name: Download appimagetool
         run: |
