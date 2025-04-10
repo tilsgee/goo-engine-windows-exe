@@ -16,6 +16,7 @@ dependencies=(
   libvulkan-dev
   libtiff-dev
   spirv-tools
+  libspirv-tools-dev
 )
 
 echo "Checking for missing dependencies..."
