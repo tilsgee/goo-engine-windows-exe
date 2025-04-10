@@ -17,12 +17,24 @@ jobs:
       - name: Install Build & Packaging Dependencies (Linux)
         run: |
           sudo apt-get update
-          # Install build tools and additional libraries (including Vulkan and TIFF support).
+          # Install build tools and extra libraries (Vulkan, TIFF, etc.)
           sudo apt-get install -y build-essential cmake git wget \
             libxi-dev libxrandr-dev libx11-dev libglu1-mesa-dev \
             libfreetype6-dev libxext-dev libssl-dev libjpeg-dev libepoxy-dev \
             libvulkan-dev libtiff-dev
-          # Download appimagetool since it isn’t available in apt.
+
+      - name: Build and Install Shaderc
+        run: |
+          echo "Cloning and building Shaderc..."
+          git clone https://github.com/google/shaderc.git
+          cd shaderc
+          mkdir build && cd build
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DSHADERC_SKIP_TESTS=ON
+          make -j$(nproc)
+          sudo make install
+
+      - name: Download appimagetool
+        run: |
           wget -O appimagetool https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
           chmod +x appimagetool
           sudo mv appimagetool /usr/local/bin/
@@ -45,7 +57,7 @@ jobs:
         run: |
           cd build
           mkdir -p AppDir/usr/bin
-          # Adjust the executable name as needed
+          # Adjust the executable name/path as appropriate
           cp goo_engine AppDir/usr/bin/
           cp ../tools/AppRun AppDir/
           cp ../tools/goo_engine.desktop AppDir/
@@ -70,6 +82,15 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
+      - name: Download Precompiled Libraries
+        run: |
+          # Ensure the parent "lib" folder exists.
+          New-Item -ItemType Directory -Force -Path "..\lib" | Out-Null
+          # Download the ZIP file containing precompiled libs.
+          Invoke-WebRequest -Uri "https://your-file-host.com/path/to/lib_win64_vc15.zip" -OutFile "..\lib\win64_vc15.zip"
+          # Extract the ZIP to the required folder.
+          Expand-Archive -Path "..\lib\win64_vc15.zip" -DestinationPath "..\lib\win64_vc15"
+
       - name: Install Build & Packaging Dependencies (Windows)
         run: |
           choco upgrade chocolatey -y
@@ -77,9 +98,7 @@ jobs:
 
       - name: Download WiX Toolset Binaries from GitHub
         run: |
-          # Create a folder for WiX binaries.
           New-Item -ItemType Directory -Force -Path "C:\wix"
-          # Download the WiX Toolset binaries (for example, from the v3.11.2 release).
           Invoke-WebRequest -Uri "https://github.com/wixtoolset/wix3/releases/download/wix3112rtm/wix311-binaries.zip" -OutFile "C:\wix\wix311-binaries.zip"
           Expand-Archive -Path "C:\wix\wix311-binaries.zip" -DestinationPath "C:\wix"
 
@@ -87,11 +106,10 @@ jobs:
         run: |
           mkdir build
           cd build
-          # Updated generator: use VS 2022, as it's available on windows-latest.
-          cmake .. -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=Release \
-                   -DWITH_COMPILER_PRECOMPILED_HEADERS=OFF \
-                   -DWITH_FFTW3=ON \
-                   -DWITH_OPENMP=ON \
+          cmake .. -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=Release `
+                   -DWITH_COMPILER_PRECOMPILED_HEADERS=OFF `
+                   -DWITH_FFTW3=ON `
+                   -DWITH_OPENMP=ON `
                    -DWITH_VULKAN_BACKEND=ON
 
       - name: Build Goo Engine (Windows)
