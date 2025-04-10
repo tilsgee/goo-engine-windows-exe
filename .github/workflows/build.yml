@@ -1,4 +1,4 @@
-name: Build and Upload Blender 4.x (AppImage & MSI)
+name: Build and Upload Goo Engine (AppImage & MSI)
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-linux:
-    name: Build Blender 4.x on Linux (AppImage)
+    name: Build Goo Engine on Linux (AppImage)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -17,10 +17,12 @@ jobs:
       - name: Install Build & Packaging Dependencies (Linux)
         run: |
           sudo apt-get update
+          # Install build tools and additional libraries (including Vulkan and TIFF support).
           sudo apt-get install -y build-essential cmake git wget \
             libxi-dev libxrandr-dev libx11-dev libglu1-mesa-dev \
-            libfreetype6-dev libxext-dev libssl-dev libjpeg-dev libepoxy-dev
-          # Download appimagetool manually since it's not available in apt
+            libfreetype6-dev libxext-dev libssl-dev libjpeg-dev libepoxy-dev \
+            libvulkan-dev libtiff-dev
+          # Download appimagetool since it isn’t available in apt.
           wget -O appimagetool https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
           chmod +x appimagetool
           sudo mv appimagetool /usr/local/bin/
@@ -28,9 +30,13 @@ jobs:
       - name: Configure Build with CMake (Linux)
         run: |
           mkdir build && cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release
+          cmake .. -DCMAKE_BUILD_TYPE=Release \
+                   -DWITH_COMPILER_PRECOMPILED_HEADERS=OFF \
+                   -DWITH_FFTW3=ON \
+                   -DWITH_OPENMP=ON \
+                   -DWITH_VULKAN_BACKEND=ON
 
-      - name: Build Blender (Linux)
+      - name: Build Goo Engine (Linux)
         run: |
           cd build
           cmake --build . -- -j$(nproc)
@@ -39,27 +45,26 @@ jobs:
         run: |
           cd build
           mkdir -p AppDir/usr/bin
-          # Copy the built Blender executable; adjust the filename/path if needed.
-          cp blender AppDir/usr/bin/
-          # Copy additional files from the tools folder into the AppDir.
+          # Adjust the executable name as needed
+          cp goo_engine AppDir/usr/bin/
           cp ../tools/AppRun AppDir/
-          cp ../tools/blender.desktop AppDir/
-          cp ../tools/blender.png AppDir/
+          cp ../tools/goo_engine.desktop AppDir/
+          cp ../tools/goo_engine.png AppDir/
           chmod +x AppDir/AppRun
 
-      - name: Package Blender as AppImage
+      - name: Package Goo Engine as AppImage
         run: |
           cd build
-          appimagetool AppDir blender-4.x-linux-x86_64.AppImage
+          appimagetool AppDir goo_engine-linux-x86_64.AppImage
 
       - name: Upload Linux AppImage Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: blender4x-linux-appimage
-          path: build/blender-4.x-linux-appimage.AppImage
+          name: goo_engine-linux-appimage
+          path: build/goo_engine-linux-x86_64.AppImage
 
   build-windows:
-    name: Build Blender 4.x on Windows (MSI)
+    name: Build Goo Engine on Windows (MSI)
     runs-on: windows-latest
     steps:
       - name: Checkout Repository
@@ -72,32 +77,36 @@ jobs:
 
       - name: Download WiX Toolset Binaries from GitHub
         run: |
-          # Create a folder for WiX binaries
+          # Create a folder for WiX binaries.
           New-Item -ItemType Directory -Force -Path "C:\wix"
-          # Download the WiX Toolset binaries zip (e.g., v3.11.2 release)
+          # Download the WiX Toolset binaries (for example, from the v3.11.2 release).
           Invoke-WebRequest -Uri "https://github.com/wixtoolset/wix3/releases/download/wix3112rtm/wix311-binaries.zip" -OutFile "C:\wix\wix311-binaries.zip"
-          # Extract the binaries
           Expand-Archive -Path "C:\wix\wix311-binaries.zip" -DestinationPath "C:\wix"
 
       - name: Configure Build with CMake (Windows)
         run: |
           mkdir build
           cd build
-          cmake .. -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Release
+          # Updated generator: use VS 2022, as it's available on windows-latest.
+          cmake .. -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=Release \
+                   -DWITH_COMPILER_PRECOMPILED_HEADERS=OFF \
+                   -DWITH_FFTW3=ON \
+                   -DWITH_OPENMP=ON \
+                   -DWITH_VULKAN_BACKEND=ON
 
-      - name: Build Blender (Windows)
+      - name: Build Goo Engine (Windows)
         run: |
           cd build
           cmake --build . --config Release -- /m
 
-      - name: Package Blender as MSI Using WiX Toolset
+      - name: Package Goo Engine as MSI Using WiX Toolset
         working-directory: build
         run: >
           "C:\wix\bin\candle.exe" ../tools/installer.wxs -out installer.wixobj &&
-          "C:\wix\bin\light.exe" installer.wixobj -out blender-4.x.wix.msi
+          "C:\wix\bin\light.exe" installer.wixobj -out goo_engine.wix.msi
 
       - name: Upload Windows MSI Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: blender4x-windows-msi
-          path: build/blender-4.x.wix.msi
+          name: goo_engine-windows-msi
+          path: build/goo_engine.wix.msi
