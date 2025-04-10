@@ -22,7 +22,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential cmake git wget \
             libxi-dev libxrandr-dev libx11-dev libglu1-mesa-dev \
-            libfreetype6-dev libxext-dev libssl-dev appimagetool
+            libfreetype6-dev libxext-dev libssl-dev
+          # Download appimagetool manually
+          wget -O appimagetool https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
+          chmod +x appimagetool
+          sudo mv appimagetool /usr/local/bin/
 
       - name: Configure Build with CMake
         run: |
@@ -38,7 +42,7 @@ jobs:
         run: |
           cd build
           mkdir -p AppDir/usr/bin
-          # Copy the built Blender executable; adjust path if necessary.
+          # Copy the built Blender executable; adjust file names/paths as necessary.
           cp blender AppDir/usr/bin/
           # Copy additional files from the tools folder into the AppDir.
           cp ../tools/AppRun AppDir/
@@ -68,7 +72,7 @@ jobs:
         run: |
           choco upgrade chocolatey -y
           choco install cmake -y --installargs 'ADD_CMAKE_TO_PATH=System'
-          choco install wix -y
+          choco install wix-toolset -y
 
       - name: Configure Build with CMake (Windows)
         run: |
