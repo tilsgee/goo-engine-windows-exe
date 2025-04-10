@@ -1,10 +1,12 @@
 name: Build and Upload Blender 4.x (AppImage & MSI)
 
+# This workflow will trigger on pushes to the "tilsgee-main" branch,
+# and it can also be manually triggered via the Actions tab.
 on:
   push:
     branches:
-      - main
-  pull_request:
+      - tilsgee-main
+  workflow_dispatch:
 
 jobs:
   build-linux:
@@ -35,9 +37,9 @@ jobs:
         run: |
           cd build
           mkdir -p AppDir/usr/bin
-          # Copy the built Blender executable. Adjust its name/path if needed.
+          # Copy the built Blender executable; adjust file names/paths as necessary.
           cp blender AppDir/usr/bin/
-          # Copy additional files from the tools folder.
+          # Copy additional files from the "tools" folder into the AppDir.
           cp ../tools/AppRun AppDir/
           cp ../tools/blender.desktop AppDir/
           cp ../tools/blender.png AppDir/
