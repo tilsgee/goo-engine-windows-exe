@@ -18,7 +18,7 @@ jobs:
         run: |
           sudo apt-get update
           # Run the custom script to install missing dependencies.
-          ./tools/install_missing_deps.sh
+          bash tools/install_missing_deps.sh
 
       - name: Build and Install Shaderc
         run: |
