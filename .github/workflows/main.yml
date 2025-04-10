@@ -1,0 +1,91 @@
+name: Build and Upload Blender 4.x (AppImage & MSI)
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build-linux:
+    name: Build Blender 4.x on Linux (AppImage)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Install Build & Packaging Dependencies (Linux)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake git wget \
+            libxi-dev libxrandr-dev libx11-dev libglu1-mesa-dev \
+            libfreetype6-dev libxext-dev libssl-dev appimagetool
+
+      - name: Configure Build with CMake
+        run: |
+          mkdir build && cd build
+          cmake .. -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build Blender
+        run: |
+          cd build
+          cmake --build . -- -j$(nproc)
+
+      - name: Prepare AppDir for AppImage Packaging
+        run: |
+          cd build
+          mkdir -p AppDir/usr/bin
+          # Copy the built Blender executable. Adjust its name/path if needed.
+          cp blender AppDir/usr/bin/
+          # Copy additional files from the tools folder.
+          cp ../tools/AppRun AppDir/
+          cp ../tools/blender.desktop AppDir/
+          cp ../tools/blender.png AppDir/
+          chmod +x AppDir/AppRun
+
+      - name: Package Blender as AppImage
+        run: |
+          cd build
+          appimagetool AppDir blender-4.x-linux-x86_64.AppImage
+
+      - name: Upload Linux AppImage Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: blender4x-linux-appimage
+          path: build/blender-4.x-linux-x86_64.AppImage
+
+  build-windows:
+    name: Build Blender 4.x on Windows (MSI)
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Install Build & Packaging Dependencies (Windows)
+        run: |
+          choco upgrade chocolatey -y
+          choco install cmake -y --installargs 'ADD_CMAKE_TO_PATH=System'
+          choco install wix -y
+
+      - name: Configure Build with CMake (Windows)
+        run: |
+          mkdir build
+          cd build
+          cmake .. -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build Blender
+        run: |
+          cd build
+          cmake --build . --config Release -- /m
+
+      - name: Package Blender as MSI Using WiX Toolset
+        working-directory: build
+        run: >
+          "C:\Program Files (x86)\WiX Toolset v3.11\bin\candle.exe" ../tools/installer.wxs -out installer.wixobj &&
+          "C:\Program Files (x86)\WiX Toolset v3.11\bin\light.exe" installer.wixobj -out blender-4.x.wix.msi
+
+      - name: Upload Windows MSI Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: blender4x-windows-msi
+          path: build/blender-4.x.wix.msi
