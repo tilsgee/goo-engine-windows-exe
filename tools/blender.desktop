@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Goo Engine
+Comment=Powerful 3D Cell Shaded Creation Suite
+Exec=blender
+Icon=blender
+Terminal=false
+Type=Application
+Categories=Graphics;3DGraphics;

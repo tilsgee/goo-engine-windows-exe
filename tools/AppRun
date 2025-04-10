@@ -1,0 +1,6 @@
+#!/bin/bash
+# Determine the AppImage's mount directory.
+HERE="$(dirname "$(readlink -f "$0")")"
+
+# Execute the Blender binary located in usr/bin and forward any input arguments.
+exec "$HERE/usr/bin/blender" "$@"

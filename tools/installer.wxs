@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="*" Name="Goo Engine" Language="1033" Version="4.1" Manufacturer="DiloonGoo Studios" UpgradeCode="PUT-GUID-HERE">
+    <Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine"/>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="Goo Engine"/>
+      </Directory>
+    </Directory>
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+      <!-- Define components/files to be installed -->
+      <Component Id="BlenderExe" Guid="PUT-ANOTHER-GUID-HERE">
+        <File Source="Release\blender.exe" KeyPath="yes"/>
+      </Component>
+    </ComponentGroup>
+    <Feature Id="ProductFeature" Title="Goo Engine" Level="1">
+      <ComponentGroupRef Id="ProductComponents"/>
+    </Feature>
+  </Product>
+</Wix>
