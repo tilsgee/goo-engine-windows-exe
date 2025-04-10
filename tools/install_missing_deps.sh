@@ -1,9 +1,8 @@
 #!/bin/bash
 set -e
 
-# List your dependencies.
-# For Ubuntu, these should be the package names you intend to install.
-# You might have names like "libxi-dev", "libxrandr-dev", etc.
+# List of dependencies to check and install if missing.
+# Adjust package names as needed for your distribution.
 dependencies=(
   libxi-dev
   libxrandr-dev
@@ -16,17 +15,19 @@ dependencies=(
   libepoxy-dev
   libvulkan-dev
   libtiff-dev
+  spirv-tools
 )
 
 echo "Checking for missing dependencies..."
 
 for pkg in "${dependencies[@]}"; do
-    # Check if the package is installed using dpkg. This works on Debian/Ubuntu.
+    # Use dpkg -l to check if the package is installed.
     if dpkg -l | grep -q "^ii\s\+$pkg\s"; then
         echo "[OK] $pkg is already installed."
     else
         echo "[INFO] $pkg is missing. Installing $pkg..."
-        sudo apt-get install -y $pkg
+        sudo apt-get update
+        sudo apt-get install -y "$pkg"
     fi
 done
 
