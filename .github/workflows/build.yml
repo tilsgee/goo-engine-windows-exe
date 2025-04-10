@@ -1,7 +1,8 @@
 name: Build and Upload Blender 4.x (AppImage & MSI)
 
-# This workflow will trigger on pushes to the "tilsgee-main" branch,
-# and it can also be manually triggered via the Actions tab.
+# This workflow triggers on:
+# - Push events to the "tilsgee-main" branch.
+# - Manually via the GitHub Actions tab (workflow_dispatch).
 on:
   push:
     branches:
@@ -37,9 +38,9 @@ jobs:
         run: |
           cd build
           mkdir -p AppDir/usr/bin
-          # Copy the built Blender executable; adjust file names/paths as necessary.
+          # Copy the built Blender executable; adjust path if necessary.
           cp blender AppDir/usr/bin/
-          # Copy additional files from the "tools" folder into the AppDir.
+          # Copy additional files from the tools folder into the AppDir.
           cp ../tools/AppRun AppDir/
           cp ../tools/blender.desktop AppDir/
           cp ../tools/blender.png AppDir/
@@ -51,7 +52,7 @@ jobs:
           appimagetool AppDir blender-4.x-linux-x86_64.AppImage
 
       - name: Upload Linux AppImage Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: blender4x-linux-appimage
           path: build/blender-4.x-linux-x86_64.AppImage
@@ -87,7 +88,7 @@ jobs:
           "C:\Program Files (x86)\WiX Toolset v3.11\bin\light.exe" installer.wixobj -out blender-4.x.wix.msi
 
       - name: Upload Windows MSI Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: blender4x-windows-msi
           path: build/blender-4.x.wix.msi
