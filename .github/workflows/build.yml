@@ -20,8 +20,8 @@ jobs:
           # Run the custom script to install missing dependencies.
           bash tools/install_missing_deps.sh
 
-          - name: Build and Install Shaderc
-          run: |
+      - name: Build and Install Shaderc
+        run: |
             git clone https://github.com/google/shaderc.git
             cd shaderc
             mkdir build && cd build
