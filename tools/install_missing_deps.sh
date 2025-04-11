@@ -42,7 +42,7 @@ dependencies=(
   libsndfile1-dev
   libcurl4-openssl-dev
   libjsoncpp-dev
-  libgcc-dev
+  #libgcc-dev
   libstdc++-12-dev
   libstdc++6
   libstdc++-12-doc
