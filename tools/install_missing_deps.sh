@@ -43,10 +43,10 @@ dependencies=(
   libcurl4-openssl-dev
   libjsoncpp-dev
   #libgcc-dev
-  libstdc++-12-dev
-  libstdc++6
-  libstdc++-12-doc
-  libstdc++-12-dbg
+  #libstdc++-12-dev
+  #libstdc++6
+  #libstdc++-12-doc
+  #libstdc++-12-dbg
   libclang-16-dev
   libclang-common-16-dev
   libclang1
