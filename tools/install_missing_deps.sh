@@ -16,7 +16,7 @@ dependencies=(
   libvulkan-dev
   libtiff-dev
   spirv-tools
-  shaderc-dev
+  libshaderc-dev
   libpng-dev
   libxkbcommon-dev
   libxkbcommon-x11-dev
