@@ -16,7 +16,14 @@ dependencies=(
   libvulkan-dev
   libtiff-dev
   spirv-tools
-  #libspirv-tools-dev
+  shaderc-dev
+  libpng-dev
+  libxkbcommon-dev
+  libxkbcommon-x11-dev
+  libwayland-dev
+  libwayland-egl-backend-dev
+  libgbm-dev
+  libdrm-dev
 )
 
 echo "Checking for missing dependencies..."
