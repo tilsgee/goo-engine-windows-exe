@@ -40,3 +40,5 @@ for pkg in "${dependencies[@]}"; do
 done
 
 echo "Dependency check complete."
+echo "All required dependencies are installed."
+echo "You can now proceed with the build process."
