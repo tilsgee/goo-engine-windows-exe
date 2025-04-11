@@ -67,6 +67,19 @@ dependencies=(
   python3-setuptools
   libdir-dev
   libboost-all-dev
+  libxxf-dev
+  libxxf86vm-dev
+  libxmu-dev
+  libxmu-headers
+  libxmu6
+  libcursor-dev
+  libxinerama-dev
+  libegl1-mesa-dev
+  libegl-dev
+  wayland-protocols
+  libdbus-1-dev
+  libudev-dev
+  linux-libc-dev
 )
 
 echo "Checking for missing dependencies..."
