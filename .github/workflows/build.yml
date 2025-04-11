@@ -40,14 +40,14 @@ jobs:
           bash tools/install_missing_deps.sh
 
           //I don't need below script, due to already installed shaderc on previous command
-      - #name: Build and Install Shaderc
-        #run: |
-            #git clone https://github.com/tilsgee/shaderc_for_github_action.git
-            #cd shaderc_for_github_action
-            #mkdir build && cd build
-            #cmake .. -DCMAKE_BUILD_TYPE=Release -DSHADERC_SKIP_TESTS=ON -DSPIRV-TOOLS_ROOT=/usr
-            #make -j$(nproc)
-            #sudo make install
+#name: Build and Install Shaderc
+#run: |
+#git clone https://github.com/tilsgee/shaderc_for_github_action.git
+#cd shaderc_for_github_action
+#mkdir build && cd build
+#cmake .. -DCMAKE_BUILD_TYPE=Release -DSHADERC_SKIP_TESTS=ON -DSPIRV-TOOLS_ROOT=/usr
+#make -j$(nproc)
+#sudo make install
 
       - name: Download appimagetool
         run: |
