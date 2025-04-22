@@ -121,10 +121,14 @@ jobs:
                    -DWITH_OPENMP=ON `
                    -DWITH_VULKAN_BACKEND=ON
 
-      - name: Build Goo Engine (Windows)
+     # - name: Build Goo Engine (Windows)
+     #   run: |
+     #     cd build
+     #     cmake --build . --config Release --target goo_engine -- /m
+
+      - name: Build Goo Engine using make.bat (Windows)
         run: |
-          cd build
-          cmake --build . --config Release -- /m
+          make.bat
 
       - name: Package Goo Engine as MSI Using WiX Toolset
         working-directory: build
