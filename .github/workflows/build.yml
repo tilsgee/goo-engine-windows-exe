@@ -91,14 +91,43 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Download Precompiled Libraries
+      - name: Checkout Blender Precompiled Libraries (Git LFS)
+        shell: pwsh # Use PowerShell for consistency if other steps use it
         run: |
-          # Ensure the parent "lib" folder exists.
-          New-Item -ItemType Directory -Force -Path "..\lib" | Out-Null
-          # Download the ZIP file containing precompiled libs.
-          Invoke-WebRequest -Uri "https://your-file-host.com/path/to/lib_win64_vc15.zip" -OutFile "..\lib\win64_vc15.zip"
-          # Extract the ZIP to the required folder.
-          Expand-Archive -Path "..\lib\win64_vc15.zip" -DestinationPath "..\lib\win64_vc15"
+          # Define paths - assumes working directory is <source_root>/build/
+          $libDir = "..\lib" # Relative path up to parent, then into 'lib'
+          $repoUrl = "https://projects.blender.org/blender/lib-windows_x64.git"
+          # Target directory name within 'lib'. Check Blender docs for the exact name needed (e.g., windows_x64 or win64_vc17).
+          $targetLibSubDir = "windows_x64"
+          $checkoutPath = Join-Path $libDir $targetLibSubDir
+      
+          Write-Host "Ensuring parent library directory exists: $libDir"
+          if (-not (Test-Path $libDir)) {
+            New-Item -ItemType Directory -Force -Path $libDir | Out-Null
+          }
+      
+          # Remove the target directory if it already exists to ensure a clean clone
+          if (Test-Path $checkoutPath) {
+            Write-Host "Removing existing library checkout directory: $checkoutPath"
+            Remove-Item -Recurse -Force $checkoutPath
+          }
+      
+          Write-Host "Cloning libraries from $repoUrl to $checkoutPath"
+          git clone --depth 1 --progress $repoUrl $checkoutPath
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "Failed to clone libraries from '$repoUrl'."
+            exit 1 # Fail the build step
+          }
+      
+          # Optional: Explicit LFS Pull if clone doesn't automatically fetch files (usually not needed if LFS initialized)
+          # Write-Host "Pulling LFS files..."
+          # Push-Location $checkoutPath
+          # git lfs pull
+          # if ($LASTEXITCODE -ne 0) { Write-Error "git lfs pull failed"; exit 1 }
+          # Pop-Location
+      
+          Write-Host "Libraries checkout complete."
+      
 
       - name: Install Build & Packaging Dependencies (Windows)
         run: |

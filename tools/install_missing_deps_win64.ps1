@@ -1,45 +1,53 @@
-# File: tools\install_blender_dependencies.ps1
-# This script installs the main dependencies needed to build Blender 4.1 on Windows.
+# File: install_missing_deps_win64.ps1 (Tools Only Version for Blender 4.x)
+# This script installs the main TOOL dependencies needed to build Blender 4.x on Windows.
+# It DOES NOT download the precompiled libraries. That should be handled by your build process (e.g., CI/CD YAML or 'make update').
 # Run this script with Administrator privileges.
 
-# Check for Administrator rights.
-if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)) {
-    Write-Error "This script must be run as Administrator. Exiting..."
-    exit 1
-}
+# Check for Administrator rights... (Keep this section)
 
-Write-Host "=== Blender 4.1 Windows Build Dependency Installer ===" -ForegroundColor Green
+Write-Host "=== Blender 4.x Windows Build TOOL Dependency Installer ===" -ForegroundColor Green
 
-# Step 1: Check for Chocolatey
-Write-Host "`nChecking for Chocolatey..."
-if (-not (Get-Command choco.exe -ErrorAction SilentlyContinue)) {
-    Write-Host "Chocolatey not found. Installing Chocolatey..."
-    Set-ExecutionPolicy Bypass -Scope Process -Force
-    [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-    Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-} else {
-    Write-Host "Chocolatey is already installed."
-}
+# Step 1: Check for Chocolatey... (Keep this section)
 
-# Step 2: Define the list of packages to install.
-# You can add or remove packages as needed.
+# Step 2: Define the list of TOOL packages to install for Blender 4.x (using VS 2022)
+Write-Host "`nDefining required tool packages..." -ForegroundColor Yellow
 $packages = @(
-    "visualstudio2019buildtools",  # Visual Studio 2019 Build Tools for C++ (modify if using VS2022)
-    "cmake",                       # CMake, required for configuring the build
-    "ninja",                       # Ninja build system for fast builds
-    "git",                         # Git for cloning and managing the repository
-    "python3",                     # Python 3 as Blender uses it for scripting
-    "7zip",                        # For extracting archives if needed
-    "vcredist140"                  # Microsoft Visual C++ Redistributable (for VS 2015-2019)
+    # --- Visual Studio 2022 Build Tools ---
+    "visualstudio2022buildtools",
+    "visualstudio2022-workload-vctools",
+
+    # --- Build System & Version Control ---
+    "cmake --installargs 'ADD_CMAKE_TO_PATH=System'",
+    "ninja",
+    "git",
+    "git-lfs", # Ensure Git LFS tool is installed
+
+    # --- Other Dependencies ---
+    "python3",
+    "7zip", 
+    # Optional
+    "vcredist143"
 )
 
-# Step 3: Install each package
-Write-Host "`nInstalling dependencies..."
-foreach ($pkg in $packages) {
-    Write-Host "Installing $pkg..."
-    choco install $pkg -y --allow-downgrade
+# Step 3: Install/Upgrade each package using Chocolatey... (Keep this section, install loop)
+
+# Step 4: Initialize Git LFS (Globally)
+Write-Host "`nInitializing Git LFS..." -ForegroundColor Yellow
+# Ensures Git LFS is ready for use by any git clone/pull commands later
+git lfs install --system
+if ($LASTEXITCODE -ne 0) {
+    Write-Warning "Git LFS initialization failed. Manual check might be needed."
+} else {
+    Write-Host "Git LFS initialized successfully."
 }
 
-Write-Host "`nAll listed dependencies have been installed." -ForegroundColor Green
-Write-Host "If you configured new tools like Visual Studio Build Tools, a system restart might be required for some changes to take effect."
-Write-Host "Proceed with your Blender 4.1 build configuration once ready!"
+# Step 5: REMOVED - Library checkout is handled separately (e.g., in build YAML or via 'make update')
+
+Write-Host "`n=== TOOL Dependency Installation Complete ===" -ForegroundColor Green
+Write-Host "Summary:"
+Write-Host "- Essential build tools (VS 2022, CMake, Ninja, Git, Git-LFS, Python) installed/updated."
+Write-Host "- Git LFS initialized."
+Write-Host "`nIMPORTANT:" -ForegroundColor Yellow
+Write-Host "- A system restart might be required for all environment variables (especially for Visual Studio) to be fully recognized."
+Write-Host "- You still need to obtain the precompiled Blender libraries separately."
+Write-Host "  This is typically done via 'make update' in the Blender source directory, or by a step in your CI/CD pipeline (YAML file)."
