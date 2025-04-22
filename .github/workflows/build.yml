@@ -91,42 +91,86 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Checkout Blender Precompiled Libraries (Git LFS)
-        shell: pwsh # Use PowerShell for consistency if other steps use it
+      - name: Checkout Blender Addons Repository
+        shell: bash # Using bash for git commands
+        # Ensure this runs from the source code root directory
+        # working-directory: ${{ github.workspace }} # Set if needed, often the default
         run: |
-          # Define paths - assumes working directory is <source_root>/build/
-          $libDir = "..\lib" # Relative path up to parent, then into 'lib'
-          $repoUrl = "https://projects.blender.org/blender/lib-windows_x64.git"
-          # Target directory name within 'lib'. Check Blender docs for the exact name needed (e.g., windows_x64 or win64_vc17).
-          $targetLibSubDir = "windows_x64"
-          $checkoutPath = Join-Path $libDir $targetLibSubDir
-      
-          Write-Host "Ensuring parent library directory exists: $libDir"
-          if (-not (Test-Path $libDir)) {
-            New-Item -ItemType Directory -Force -Path $libDir | Out-Null
+          ADDONS_REPO_URL="https://projects.blender.org/blender/blender-addons.git"
+          # The target directory expected by CMake
+          ADDONS_TARGET_DIR="scripts/addons"
+
+          echo "Checking addons directory: $ADDONS_TARGET_DIR"
+          if [ -d "$ADDONS_TARGET_DIR" ] ; then
+            echo "Addons directory already exists. Skipping clone."
+          else
+            echo "Cloning addons from $ADDONS_REPO_URL into $ADDONS_TARGET_DIR"
+            # Use --depth 1 for a faster shallow clone (no history)
+            git clone --depth 1 "$ADDONS_REPO_URL" "$ADDONS_TARGET_DIR"
+            if [ $? -ne 0 ]; then
+              echo "::error::Failed to clone Blender addons."
+              exit 1
+            fi
+            echo "Blender addons cloned successfully."
+          fi
+
+          # Optional: If Goo Engine also uses contrib addons, uncomment and adapt below
+          # ADDONS_CONTRIB_REPO_URL="https://projects.blender.org/blender/blender-addons-contrib.git"
+          # ADDONS_CONTRIB_TARGET_DIR="scripts/addons_contrib"
+          # echo "Checking contrib addons directory: $ADDONS_CONTRIB_TARGET_DIR"
+          # if [ -d "$ADDONS_CONTRIB_TARGET_DIR" ] ; then
+          #   echo "Contrib addons directory already exists. Skipping clone."
+          # else
+          #   echo "Cloning contrib addons from $ADDONS_CONTRIB_REPO_URL into $ADDONS_CONTRIB_TARGET_DIR"
+          #   git clone --depth 1 "$ADDONS_CONTRIB_REPO_URL" "$ADDONS_CONTRIB_TARGET_DIR"
+          #   if [ $? -ne 0 ]; then
+          #     echo "::warning::Failed to clone Blender contrib addons (optional)."
+          #     # Decide if this failure should stop the build (exit 1) or just warn
+          #   else
+          #     echo "Blender contrib addons cloned successfully."
+          #   fi
+          # fi
+
+      - name: Checkout Goo Engine Precompiled Libraries (for VC17)
+        shell: pwsh
+        # Ensure this runs from the source code root directory
+        # working-directory: ${{ github.workspace }} # Set if needed, often the default
+        run: |
+          $libParentDir = "..\lib" # Relative to source root: one level up, then 'lib'
+          $repoUrl = "https://projects.blender.org/blender/lib-windows_x64.git" # Official libs repo
+          $targetLibSubDir = "win64_vc17" # Target directory name MUST match the corrected CMake logic
+          $checkoutPath = Join-Path $libParentDir $targetLibSubDir
+
+          Write-Host "Preparing library directory structure..."
+          # Ensure the parent 'lib' directory exists relative to source parent
+          $actualLibParentPath = Resolve-Path "..\lib" -ErrorAction SilentlyContinue
+          if (-not $actualLibParentPath) {
+            New-Item -ItemType Directory -Path "..\lib" | Out-Null
+            Write-Host "Created directory: ..\lib"
+          } else {
+             Write-Host "Directory exists: ..\lib"
           }
-      
-          # Remove the target directory if it already exists to ensure a clean clone
-          if (Test-Path $checkoutPath) {
-            Write-Host "Removing existing library checkout directory: $checkoutPath"
+
+          # Navigate up one level to perform the clone into the correct relative path
+          Push-Location ..
+
+          # Ensure clean state by removing target if it exists
+          if (Test-Path $checkoutPath -PathType Container) {
+            Write-Host "Removing existing library directory: $checkoutPath"
             Remove-Item -Recurse -Force $checkoutPath
           }
-      
-          Write-Host "Cloning libraries from $repoUrl to $checkoutPath"
+
+          Write-Host "Cloning libraries from '$repoUrl' directly into '$checkoutPath'"
+          # Use git clone <url> <target_directory> feature
           git clone --depth 1 --progress $repoUrl $checkoutPath
           if ($LASTEXITCODE -ne 0) {
             Write-Error "Failed to clone libraries from '$repoUrl'."
-            exit 1 # Fail the build step
+            exit 1 # Fail the workflow step
           }
-      
-          # Optional: Explicit LFS Pull if clone doesn't automatically fetch files (usually not needed if LFS initialized)
-          # Write-Host "Pulling LFS files..."
-          # Push-Location $checkoutPath
-          # git lfs pull
-          # if ($LASTEXITCODE -ne 0) { Write-Error "git lfs pull failed"; exit 1 }
-          # Pop-Location
-      
-          Write-Host "Libraries checkout complete."
+
+          Write-Host "Libraries checkout complete into '$checkoutPath'"
+
+          Pop-Location # Return to the original source directory
       
 
       - name: Install Build & Packaging Dependencies (Windows)
