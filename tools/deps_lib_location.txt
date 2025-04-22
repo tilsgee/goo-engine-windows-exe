@@ -1,0 +1,14 @@
+for windows x86 64 bit:
+- https://projects.blender.org/blender/lib-windows_x64
+
+for windows arm 64 bit (those Snapdragon X Elite guys):
+- https://projects.blender.org/blender/lib-windows_arm64
+
+for linux x86 64 bit:
+- https://projects.blender.org/blender/lib-linux_x64
+
+for macOS on Intel hardware:
+- https://projects.blender.org/blender/lib-macos_x64
+
+for macOS on Apple Sillicon hardware (those M Series chip guys):
+- https://projects.blender.org/blender/lib-macos_arm64
